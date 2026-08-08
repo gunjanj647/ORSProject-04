@@ -17,7 +17,7 @@ services:
       context: .
     container_name: ORSProject-04-webapp
     ports:
-      - "8081:8081"
+      - "8080:8080"
     networks:
       - mynetwork
     depends_on:
