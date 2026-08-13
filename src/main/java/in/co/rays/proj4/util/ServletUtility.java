@@ -1,6 +1,7 @@
 package in.co.rays.proj4.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -12,21 +13,7 @@ import in.co.rays.proj4.bean.BaseBean;
 import in.co.rays.proj4.controller.BaseCtl;
 import in.co.rays.proj4.controller.ORSView;
 
-
-/**
- * 
- * ServletUtility class contains utility functions like
- * requestDispatcher,sendRedirect.
- *It also contains functions to implement business validations
- *like setErrorMessage,getErrorMessage
- * It also contains utility functions for 
- * carrying data in request like setBean,setList,setPageNo,setPageSize.
- * 
- * @authorGunjan jain
- * @version 1.0
- */
 public class ServletUtility {
-
 	public static void forward(String page, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		RequestDispatcher rd = request.getRequestDispatcher(page);
@@ -63,7 +50,6 @@ public class ServletUtility {
 
 	public static String getErrorMessage(HttpServletRequest request) {
 		String val = (String) request.getAttribute(BaseCtl.MSG_ERROR);
-		//System.out.println("mmmmmmmmsssssssssssssssggggggggggg = " + val);
 		if (val == null) {
 			return "";
 		} else {
@@ -73,12 +59,10 @@ public class ServletUtility {
 
 	public static void setSuccessMessage(String msg, HttpServletRequest request) {
 		request.setAttribute(BaseCtl.MSG_SUCCESS, msg);
-		//System.out.println("Success message in setSuccess="+msg);
 	}
 
 	public static String getSuccessMessage(HttpServletRequest request) {
 		String val = (String) request.getAttribute(BaseCtl.MSG_SUCCESS);
-		System.out.println("mmmmmmmmsssssssssssssssggggggggggg = " + val);
 		if (val == null) {
 			return "";
 		} else {
@@ -94,22 +78,21 @@ public class ServletUtility {
 		return (BaseBean) request.getAttribute("bean");
 	}
 
-	public static void setList(List list,HttpServletRequest request) {
-		request.setAttribute("list", list);
-	}
-
-	public static List getList(HttpServletRequest request) {
-		return (List) request.getAttribute("list");
-	}
-
 	public static String getParameter(String property, HttpServletRequest request) {
-		String val = (String) request.getAttribute(property);
+		String val = (String) request.getParameter(property);
 		if (val == null) {
 			return "";
 		} else {
 			return val;
 		}
+	}
 
+	public static void setList(List list, HttpServletRequest request) {
+		request.setAttribute("list", list);
+	}
+
+	public static List getList(HttpServletRequest request) {
+		return (List) request.getAttribute("list");
 	}
 
 	public static void setPageNo(int pageNo, HttpServletRequest request) {
@@ -128,9 +111,28 @@ public class ServletUtility {
 		return (Integer) request.getAttribute("pageSize");
 	}
 
-	public static void handleException(Exception e, HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
-		request.setAttribute("exception", e);
-		response.sendRedirect(ORSView.ERROR_CTL);
-	}
+	
+	  public static void handleException(Exception e, HttpServletRequest request,
+	  HttpServletResponse response) throws IOException, ServletException {
+	  request.setAttribute("exception", e);
+	  response.sendRedirect(ORSView.ERROR_CTL); 
+	 
+
+	  }
+	  public static void handleExceptionDB(String page, HttpServletRequest request, HttpServletResponse response)
+	            throws IOException, ServletException {
+	        setErrorMessage("DATABASE SERVER DOWN....!!", request);
+	        forward(page, request, response);
+	    }
+	    
+	    public static void handleExceptionDBList(String page, BaseBean bean, int pageNo, int pageSize, HttpServletRequest request, HttpServletResponse response)
+	            throws IOException, ServletException {
+	        setErrorMessage("DATABASE SERVER DOWN UNABLE TO LOAD LIST....!!", request);
+	        setList(new ArrayList<>(), request);
+	        setBean(bean, request);
+	        request.setAttribute("pageNo", pageNo);
+			request.setAttribute("pageSize", pageSize);
+			request.setAttribute("nextListSize", 0);
+	        forward(page, request, response);
+	    }
 }
